@@ -20,7 +20,7 @@ class Botao():
             # se n achar o arquivo
             except FileNotFoundError:
                 try:
-                    self.img = pygame.image.load("imgs/lutadores/locker_icon.png")
+                    self.img = pygame.image.load("imgs/locker_icon.png")
                     self.text = "Locked"
                 except FileNotFoundError as e:
                     print("Arquivos corrompidos, não foi possível carregar a imagem do cadeado")

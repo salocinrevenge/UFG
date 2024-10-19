@@ -21,6 +21,11 @@ class Menu():
                 print(e.message)
         if self.STATE == "Sair":
             raise Std("Sair")
+        if self.STATE == "Start":
+            self.mundo = Mundo(self.selection)
+            self.STATE = "Mundo"
+        if self.STATE == "Mundo":
+            self.mundo.tick()
 
     def render(self, screen):
         if self.STATE == "Menu":
@@ -33,6 +38,9 @@ class Menu():
                 botao.render(screen)
             for choice in self.selecao:
                 choice.render(screen)
+            return
+        if self.STATE == "Mundo":
+            self.mundo.render(screen)
             return
 
         
@@ -49,9 +57,9 @@ class Menu():
     def criaBotoesMenuJogar(self):
         self.botoesMenuJogar = []
         posicoes = [(150, 100), (350, 100), (550, 100), (150, 400), (350, 400), (550, 400), (150, 600), (350, 600), (550, 600)]
-        self.botoesMenuJogar.append(Botao(*posicoes[0], 128, 128, "Cenario 1", path = "imgs/cenario/1/icon.png"))
-        self.botoesMenuJogar.append(Botao(*posicoes[1], 128, 128, "Cenario 2", path = "imgs/cenario/2/icon.png"))
-        self.botoesMenuJogar.append(Botao(*posicoes[2], 128, 128, "Cenario 3", path = "imgs/cenario/3/icon.png"))
+        self.botoesMenuJogar.append(Botao(*posicoes[0], 128, 128, "cenario 1", path = "imgs/cenario/1/icon.png"))
+        self.botoesMenuJogar.append(Botao(*posicoes[1], 128, 128, "cenario 2", path = "imgs/cenario/2/icon.png"))
+        self.botoesMenuJogar.append(Botao(*posicoes[2], 128, 128, "cenario 3", path = "imgs/cenario/3/icon.png"))
 
         self.botoesMenuJogar.append(Botao(*posicoes[3], 128, 128, "Jogador 1", path = "imgs/lutadores/1/icon.png"))
         self.botoesMenuJogar.append(Botao(*posicoes[4], 128, 128, "Jogador 2", path = "imgs/lutadores/2/icon.png"))
@@ -61,6 +69,7 @@ class Menu():
         self.botoesMenuJogar.append(Botao(*posicoes[7], 128, 128, "Jogador 5", path = "imgs/lutadores/5/icon.png"))
         self.botoesMenuJogar.append(Botao(*posicoes[8], 128, 128, "Jogador 6", path = "imgs/lutadores/6/icon.png"))
         self.botoesMenuJogar.append(Botao(50, 800, 100, 50, "Voltar", textSize = 36))
+        self.botoesMenuJogar.append(Botao(650, 800, 100, 50, "Start", textSize = 36))
         self.selecao = []
         self.selecao.append(Choice(posicoes[:3], 0, 132, 132, "Cenario", cor = (0, 200, 0)))
         self.selecao.append(Choice(posicoes[3:], 0, 132, 132, "Jogador 1", cor = (200, 0, 0), tamanho = 36))
@@ -80,6 +89,11 @@ class Menu():
                         if clique == "Voltar":
                             self.STATE = "Menu"
                             return
+                        if clique == "Start":
+                            if self.selection[0] != None and self.selection[1] != None and self.selection[2] != None:
+                                self.STATE = "Start"
+                                print("Start")
+                                return
                         if clique == "Cenario 1" and self.selection[0] == None:
                             self.selecao[0].index = 0
                             self.selection[0] = clique
@@ -87,10 +101,12 @@ class Menu():
         if evento.type == pygame.KEYDOWN:
             if self.STATE == "Jogar":
                 if evento.key == pygame.K_RETURN or evento.key == pygame.K_SPACE:
+                    if self.selection[1] != None and self.selection[2] != None:
+                        self.STATE = "Start"
                     if self.selection[0] == None:
                         if self.botoesMenuJogar[self.selecao[0].index].text == "Locked":
                             return
-                        self.selection[0] = self.selecao[0].index
+                        self.selection[0] = self.botoesMenuJogar[self.selecao[0].index].text
                         # corta a cor pela metade
                         self.selecao[0].cor = (self.selecao[0].cor[0]//2, self.selecao[0].cor[1]//2, self.selecao[0].cor[2]//2)
 
@@ -98,7 +114,7 @@ class Menu():
                     if self.selection[1] == None:
                         if self.botoesMenuJogar[self.selecao[1].index+3].text == "Locked":
                             return
-                        self.selection[1] = self.selecao[1].index
+                        self.selection[1] = self.botoesMenuJogar[self.selecao[1].index+3].text
                         self.selecao[1].cor = (self.selecao[1].cor[0]//2, self.selecao[1].cor[1]//2, self.selecao[1].cor[2]//2)
                     
                 # se clicou .
@@ -106,7 +122,7 @@ class Menu():
                     if self.selection[2] == None:
                         if self.botoesMenuJogar[self.selecao[2].index+3].text == "Locked":
                             return
-                        self.selection[2] = self.selecao[2].index
+                        self.selection[2] = self.botoesMenuJogar[self.selecao[2].index+3].text
                         self.selecao[2].cor = (self.selecao[2].cor[0]//2, self.selecao[2].cor[1]//2, self.selecao[2].cor[2]//2)
                     
                 if evento.key == pygame.K_ESCAPE:

@@ -1,20 +1,21 @@
 import pygame
+from camera import Camera
+from personagem import Personagem
 
 class Mundo():
-    def __init__(self) -> None:
-        pass
+    def __init__(self, objetos) -> None:
+        self.camera = Camera(self,(0,0))
+        self.fundo = pygame.image.load(f"imgs/{objetos[0].split()[0]}/{objetos[0].split()[1]}/fundo.png")
+        self.player1 = Personagem(objetos[1])
+        self.player2 = Personagem(objetos[2])
 
     def tick(self):
         pass
         self.camera.tick()
         
     def input(self, evento):
-        posCentral = self.salaAtual.getPos()
-        for i in range(-self.renderDistance,self.renderDistance+1):
-            for j in range(-self.renderDistance,self.renderDistance+1):
-                if i+posCentral[0] < 0 or i+posCentral[0] >= len(self.salas) or j+posCentral[1] < 0 or j+posCentral[1] >= len(self.salas[0]):
-                    continue
-                self.salas[i+posCentral[0]][j+posCentral[1]].input(evento)
+        pass
     
     def render(self, screen):
-        screen.fill((200,255,255))
+        self.camera.render(screen, self.fundo, (0,0))
+        self.player1.render(screen, self.camera)
