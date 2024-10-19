@@ -6,6 +6,7 @@ class Personagem:
         self.imagens = {}
         self.x = pos[0]
         self.y = pos[1]
+        self.gravidade = 2
 
         self.velx = 0
         self.vely = 0
@@ -13,9 +14,10 @@ class Personagem:
         self.changeState("Andar M")
         self.anim = 0
         self.tempoAnim = 0
-        self.tempoAnimMax = 20
+        self.tempoAnimMax = 15
         self.team = team
         self.colision_box = pygame.Rect(self.x+64, self.y, 128, 384)
+        self.pulavel = True
 
     
     def changeState(self, state):
@@ -29,6 +31,12 @@ class Personagem:
     def tick(self):
         self.x += self.velx
         self.y += self.vely
+        self.y = min(500, self.y)
+        self.vely += self.gravidade
+        self.vely = min(1000, self.vely)
+
+        if abs(self.y - 500) < 3:
+            self.pulavel = True
 
         self.colision_box.x = self.x+64
         self.colision_box.y = self.y
@@ -37,8 +45,8 @@ class Personagem:
         if self.tempoAnim >= self.tempoAnimMax:
             self.tempoAnim = 0
             self.anim += 1
-            # if self.anim >= len(self.imagem):
-            if self.anim >= 2:
+            if self.anim >= len(self.imagem):
+            # if self.anim >= 2:
                 self.anim = 0
 
     controles = {"a": (pygame.K_a, pygame.K_LEFT), "d": (pygame.K_d, pygame.K_RIGHT), "w": (pygame.K_w, pygame.K_UP), "s": (pygame.K_s, pygame.K_DOWN)}
@@ -51,7 +59,9 @@ class Personagem:
         pass
 
     def saltar(self):
-        self.vely = -20
+        if self.pulavel:
+            self.vely = -45
+            self.pulavel = False
 
     def input(self, evento):
 
