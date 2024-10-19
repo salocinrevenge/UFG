@@ -1,3 +1,5 @@
+import pygame
+
 class Camera():
     def __init__(self, mundo, pos) -> None:
         self.mundo = mundo
@@ -8,8 +10,10 @@ class Camera():
         # deslSala = self.target.mundo.deslocamentoSala()
         pass
     
-    def render(self, screen, imagem, pos):
+    def render(self, screen, imagem, pos, colisao = None):
         screen.blit(imagem, (pos[0],pos[1]))
+        if colisao:
+            pygame.draw.rect(screen, (255,0,0), colisao, 2)
         
     
     def input(self, evento):

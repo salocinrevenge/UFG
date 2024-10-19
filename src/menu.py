@@ -13,6 +13,9 @@ class Menu():
         self.fonte_padrao = pygame.font.Font(None, 200)
         self.selection = [None, None, None]
 
+        self.STATE = "Start"
+        self.selection = ['cenario 1', 'Jogador 1', 'Jogador 1']
+
     def tick(self):
         if self.STATE == "Lutar":
             try:
@@ -92,7 +95,6 @@ class Menu():
                         if clique == "Start":
                             if self.selection[0] != None and self.selection[1] != None and self.selection[2] != None:
                                 self.STATE = "Start"
-                                print("Start")
                                 return
                         if clique == "Cenario 1" and self.selection[0] == None:
                             self.selecao[0].index = 0
