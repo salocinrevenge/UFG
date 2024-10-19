@@ -86,7 +86,7 @@ class Menu():
 
         if evento.type == pygame.KEYDOWN:
             if self.STATE == "Jogar":
-                if evento.key == pygame.K_RETURN:
+                if evento.key == pygame.K_RETURN or evento.key == pygame.K_SPACE:
                     if self.selection[0] == None:
                         if self.botoesMenuJogar[self.selecao[0].index].text == "Locked":
                             return
@@ -109,16 +109,22 @@ class Menu():
                         self.selection[2] = self.selecao[2].index
                         self.selecao[2].cor = (self.selecao[2].cor[0]//2, self.selecao[2].cor[1]//2, self.selecao[2].cor[2]//2)
                     
+                if evento.key == pygame.K_ESCAPE:
+                    for i in range(len(self.selection)-1,-1,-1):
+                        if self.selection[i] != None:
+                            self.selection[i] = None
+                            self.selecao[i].cor = (self.selecao[i].cor[0]*2, self.selecao[i].cor[1]*2, self.selecao[i].cor[2]*2)
+                            break
                     
                 for i, choice in enumerate(self.selecao):
                     if self.selection[i] == None:
                         if i == 0:
                             choice.input(evento)
+                            break
                         if evento.key in (pygame.K_a, pygame.K_s, pygame.K_d, pygame.K_w) and i == 1:
                             choice.input(evento)
                         if evento.key in (pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT, pygame.K_UP) and i == 2:
                             choice.input(evento)
-                        break
         if self.STATE == "Mundo":
             try:
                 self.mundo.input(evento)
