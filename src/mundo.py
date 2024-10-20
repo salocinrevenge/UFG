@@ -8,8 +8,9 @@ class Mundo():
         self.camera = Camera(self,(0,0))
         self.fundo = pygame.image.load(f"imgs/{objetos[0].split()[0]}/{objetos[0].split()[1]}/fundo.png")
         self.fundo = pygame.transform.scale(self.fundo, (self.fundo.get_width()*3.3, self.fundo.get_height()*3))
-        self.player1 = Personagem(objetos[1], (0,500), 0)
-        self.player2 = Personagem(objetos[2], (600,500), 1)
+        debug = True
+        self.player1 = Personagem(objetos[1], (0,500), 0, debug)
+        self.player2 = Personagem(objetos[2], (600,500), 1, debug)
         self.vitoria = None
         self.contador_fim = 0
         self.mostrar_press_anything = False
@@ -100,6 +101,15 @@ class Mundo():
                 self.player1.x += 10
             self.player2.attack_box = None
             self.player1.damage(self.player2.danos[self.player2.STATE])
+
+        for projetil in self.projeteis:
+            if projetil.colision_box.colliderect(self.player1.colision_box):
+                self.player1.damage(projetil.dano)
+                projetil.atingiu()
+            if projetil.colision_box.colliderect(self.player2.colision_box):
+                self.player2.damage(projetil.dano)
+                projetil.dano = 0
+                projetil.atingiu()
 
         
     def input(self, evento):

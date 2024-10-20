@@ -3,7 +3,7 @@ import os
 from projetil import ProjetilLateral, ProjetilCeu, ProjetilArea
 
 class Personagem:
-    def __init__(self, id, pos, team) -> None:
+    def __init__(self, id, pos, team, debug = False) -> None:
         self.id = id.split()[1]
         self.imagens = {}
         self.x = pos[0]
@@ -37,6 +37,27 @@ class Personagem:
         self.vivo = True
 
         self.projetils_lancados = []
+
+        self.combos = []
+        self.maior_combo = 0
+        self.lidos = []
+        try:
+            with open(f"imgs/lutadores/{self.id}/combos.txt") as f:
+                combosLidos = f.read().strip().split()
+                for i in range(len(combosLidos)):
+                    match i%3:
+                        case 0:
+                            self.combos.append([combosLidos[i]])
+                        case 1: 
+                            continue
+                        case 2:
+                            self.combos[-1].append(combosLidos[i])
+                            self.maior_combo = max(self.maior_combo, len(combosLidos[i]))
+
+                print(combosLidos)
+        except FileNotFoundError:
+            pass
+        self.debug = debug
 
     def damage(self, dano):
         if self.defendendo:
@@ -74,11 +95,39 @@ class Personagem:
         else:
             self.atack_box = pygame.Rect(self.x+self.colision_box.width+128, self.y+posy, largura_atack_box, altura_atack_box)
 
+    def verificadorCombo(self):
+        for combo in self.combos:
+            # converte lidos para string
+            lido = ""
+            for elem in range(len(self.lidos)):
+                letra = self.codificacaoInversa[self.team][self.lidos[elem]]
+                if self.orientacao == 0:
+                    if letra == "a":
+                        letra = "d"
+                    elif letra == "d":
+                        letra = "a"
+                lido += letra
+
+            # print(combo, lido)
+            if lido == combo[1]:
+                match combo[0]:
+                    case '1':
+                        self.feiticoFrente()
+                    case '2':
+                        self.feiticoCeu()
+                    case '3':
+                        self.feiticoArea()
+                    case _:
+                        raise Exception("Combo não implementado")
+                self.lidos = []
+
+    altura_braco = 75
+
     def atack_tick(self):
         if self.STATE == "Soco M":
             # cria a hitbox do soco
             if self.anim == 2:
-                self.criarAtackHitbox(75, 50, 75)
+                self.criarAtackHitbox(75, 50, self.altura_braco)
 
             # remove a hitbox do soco
             if self.anim == 3:
@@ -132,11 +181,14 @@ class Personagem:
                 self.changeState(self.STATE)
 
         self.atack_tick()
-
+        self.verificadorCombo()
     
 
-    controles = {"a": (pygame.K_a, pygame.K_LEFT), "d": (pygame.K_d, pygame.K_RIGHT), "w": (pygame.K_w, pygame.K_UP), "s": (pygame.K_s, pygame.K_DOWN), "f": (pygame.K_f, pygame.K_COMMA), "g": (pygame.K_g, pygame.K_PERIOD), "h": (pygame.K_h, 59)}
-
+    controles = {"a": (pygame.K_a, pygame.K_LEFT), "d": (pygame.K_d, pygame.K_RIGHT), "w": (pygame.K_w, pygame.K_UP), "s": (pygame.K_s, pygame.K_DOWN), "f": (pygame.K_f, pygame.K_COMMA), "g": (pygame.K_g, pygame.K_PERIOD), "h": (pygame.K_h, pygame.K_SEMICOLON)}
+    todos_controles = ((pygame.K_a, pygame.K_d, pygame.K_w, pygame.K_s, pygame.K_f, pygame.K_g, pygame.K_h), 
+                        (pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN, pygame.K_COMMA, pygame.K_PERIOD, pygame.K_SEMICOLON))
+    
+    codificacaoInversa = ({pygame.K_a: "a", pygame.K_d: "d", pygame.K_w: "w", pygame.K_s: "s", pygame.K_f: "f", pygame.K_g: "g", pygame.K_h: "h"},{pygame.K_LEFT: "a", pygame.K_RIGHT: "d", pygame.K_UP: "w", pygame.K_DOWN: "s", pygame.K_COMMA: "f", pygame.K_PERIOD: "g", pygame.K_SEMICOLON: "h"})
 
     def agaixar(self):
         pass
@@ -153,8 +205,7 @@ class Personagem:
         self.changeState("Soco M")
     
     def chute(self):
-        # self.changeState("Chute M")
-        self.lancaProjetil()
+        self.changeState("Chute M")
 
     def defender(self):
         self.changeState("Defesa M")
@@ -162,8 +213,13 @@ class Personagem:
     def soltarDefesa(self):
         self.changeState("Idle M")
 
-    def lancaProjetil(self):
-        projetil = ProjetilLateral(self.x, self.y, self.orientacao, f"imgs/lutadores/{self.id}/projetilLateral.png")
+    def feiticoFrente(self):
+        largura_projetil = 32
+        if self.orientacao == 0:
+            projetil = ProjetilLateral(self.x+128//2-largura_projetil, self.y+self.altura_braco, self.orientacao, f"imgs/lutadores/{self.id}/projetilLateral.png", largura_projetil, self.debug)
+        else:
+            projetil = ProjetilLateral(self.x+self.colision_box.width+128+ 128//2, self.y+self.altura_braco, self.orientacao, f"imgs/lutadores/{self.id}/projetilLateral.png", largura_projetil, self.debug)
+
         self.projetils_lancados.append(projetil)
 
     def feiticoCeu(self):
@@ -177,6 +233,10 @@ class Personagem:
     def input(self, evento):
 
         if evento.type == pygame.KEYDOWN:
+            if evento.key in self.todos_controles[self.team]:
+                self.lidos.append(evento.key)
+                if len(self.lidos) > self.maior_combo:
+                    self.lidos.pop(0)
             if evento.key == self.controles["a"][self.team]:
                 self.velx += -self.impulso
                 self.changeState("Andar M")
@@ -235,9 +295,8 @@ class Personagem:
 
 
     def render(self, screen, camera):
-        debug = True
         camera.render(screen, self.imagem[self.anim], (self.x+self.corrige_horizontal, self.y))
-        if debug:
+        if self.debug:
             camera.draw_rect(screen, self.colision_box, (255,255,0))
             if self.atack_box != None:
                 camera.draw_rect(screen, self.atack_box, (255,0,0))
