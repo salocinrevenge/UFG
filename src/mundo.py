@@ -131,7 +131,6 @@ class Mundo():
         for projetil in self.projeteis:
             projetil.render(screen, self.camera)
 
-        # Mostra o texto <nome> venceu no meio da tela
 
         if self.vitoria != None:
             font = pygame.font.Font(None, 72)
