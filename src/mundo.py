@@ -61,7 +61,7 @@ class Mundo():
         if self.player2.x > 3000:
             self.player2.x = 3000
 
-        if abs(self.player1.x - self.player2.x) > 1800:
+        if abs(self.player1.x - self.player2.x) > 700:
             if self.player1.x < self.player2.x:
                 self.player1.x += 10
                 self.player2.x -= 10

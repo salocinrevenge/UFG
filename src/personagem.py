@@ -299,9 +299,9 @@ class Personagem:
         largura = self.pontos_colisoes[6][0]
         altura = self.pontos_colisoes[6][1]
         if self.orientacao == 0:
-            projetil = ProjetilCeu(self.x+128//2-largura-600, self.y-800, self.orientacao, f"imgs/lutadores/{self.id}/projetilLateral.png", largura = largura, altura = altura, debug = self.debug)
+            projetil = ProjetilCeu(self.x+128//2-largura-300, self.y-800, self.orientacao, f"imgs/lutadores/{self.id}/projetilLateral.png", largura = largura, altura = altura, debug = self.debug)
         else:
-            projetil = ProjetilCeu(self.x+self.colision_box.width+128+ 128//2+600, self.y-800, self.orientacao, f"imgs/lutadores/{self.id}/projetilLateral.png", largura = largura, altura = altura, debug = self.debug)
+            projetil = ProjetilCeu(self.x+self.colision_box.width+128+ 128//2+300, self.y-800, self.orientacao, f"imgs/lutadores/{self.id}/projetilLateral.png", largura = largura, altura = altura, debug = self.debug)
 
         self.projetils_lancados.append(projetil)
 

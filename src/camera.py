@@ -11,7 +11,7 @@ class Camera():
     def tick(self):
         if self.screen != None:
             self.deslocamento_x = self.screen.get_width()/2
-        self.x = (self.mundo.player1.x + self.mundo.player2.x)/2 - self.deslocamento_x + 128
+        self.x = (self.mundo.player1.x + self.mundo.player2.x)/2 - self.deslocamento_x + 128*1.8
     
     def render(self, screen, imagem, pos):
         if self.screen == None:
