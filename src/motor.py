@@ -23,7 +23,7 @@ class Coracao():
         self.screen = pygame.display.set_mode((self.WINDOW_WIDTH, self.WINDOW_HEIGHT), pygame.RESIZABLE)
         pygame.display.set_caption("UNICAMP FIGHTING GAME") # titulo da janela
         # forca fullscreen
-        # pygame.display.toggle_fullscreen()
+        pygame.display.toggle_fullscreen()
         
 
 

@@ -1,3 +1,2 @@
 1 bola_de_fogo ddf
 2 raio wsg
-3 protecao adh
