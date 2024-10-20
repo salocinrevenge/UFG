@@ -14,13 +14,12 @@ class Personagem:
         self.vely = 0
         self.impulso = 10
         self.orientacao = 0
-        self.changeState("Idle M")
+        self.agaixado = False
         self.anim = 0
         self.tempoAnim = 0
-        self.tempoAnimMax = {"Idle M": 15, "Andar M": 10, "Soco M": 5, "Chute M": 10, "Defesa M": 1}
-        self.danos = {"Soco M": 1, "Chute M": 2}
+        self.tempoAnimMax = {"Idle M": 15, "Andar M": 10, "Soco M": 5, "Chute M": 10, "Defende M": 1, "Idle S": 15, "Andar S": 10, "Soco S": 5, "Chute S": 10, "Defende S": 1, "Special 1": 10, "Special 2": 10, "Special 3": 10, "Pulo": 1}
+        self.danos = {"Soco M": 1, "Chute M": 2, "Soco S": 1, "Chute S": 1}
         self.team = team
-        self.colision_box = pygame.Rect(self.x+128, self.y, 128, 384)
         self.pulavel = True
         self.deCostas = False
         self.corrige_horizontal = 0
@@ -54,10 +53,22 @@ class Personagem:
                             self.combos[-1].append(combosLidos[i])
                             self.maior_combo = max(self.maior_combo, len(combosLidos[i]))
 
-                print(combosLidos)
         except FileNotFoundError:
             pass
         self.debug = debug
+
+        self.pontos_colisoes = []
+        with open(f"imgs/lutadores/{self.id}/colisoes.txt", "r") as f:
+            for linha in f:
+                largura, altura, posy = map(int, linha.split()) # largura altura posy
+                self.pontos_colisoes.append((largura, altura, posy))
+
+        self.colision_box_de_pe = pygame.Rect(self.x+128, self.y, self.pontos_colisoes[4][0], self.pontos_colisoes[4][1])
+        self.corrige_vertical_sentado = self.pontos_colisoes[5][2]
+        self.colision_box_sentado = pygame.Rect(self.x+128, self.y+self.pontos_colisoes[5][2], self.pontos_colisoes[5][0], self.pontos_colisoes[5][1])
+        self.colision_box = self.colision_box_de_pe
+        self.changeState("Idle M")
+        self.pode_special = True
 
     def damage(self, dano):
         if self.defendendo:
@@ -70,19 +81,24 @@ class Personagem:
 
     
     def changeState(self, state):
+        self.colision_box = self.colision_box_de_pe
+        if self.agaixado:
+            # substitui o M por S
+            state = state.replace(" M", " S")
+            self.colision_box = self.colision_box_sentado
         self.atack_box = None
         self.anim = 0
         self.STATE = state
         self.defendendo = False
-        if state == "Defesa M":
+        if state == "Defende M":
             self.defendendo = True
         if state+str(self.orientacao) not in self.imagens:
             self.imagens[state+str(self.orientacao)] = []
             for img in sorted(os.listdir(f"imgs/lutadores/{self.id}/{state}/")):
                 if self.orientacao == 0:
-                    nova_imagem = pygame.image.load(f"imgs/lutadores/{self.id}/{state}/{img}")
-                else:
                     nova_imagem = pygame.transform.flip(pygame.image.load(f"imgs/lutadores/{self.id}/{state}/{img}"), True, False)
+                else:
+                    nova_imagem = pygame.image.load(f"imgs/lutadores/{self.id}/{state}/{img}")
                 self.imagens[state+str(self.orientacao)].append(nova_imagem)
         self.imagem = self.imagens[state+str(self.orientacao)]
 
@@ -96,6 +112,8 @@ class Personagem:
             self.atack_box = pygame.Rect(self.x+self.colision_box.width+128, self.y+posy, largura_atack_box, altura_atack_box)
 
     def verificadorCombo(self):
+        if self.agaixado:
+            return
         for combo in self.combos:
             # converte lidos para string
             lido = ""
@@ -108,26 +126,28 @@ class Personagem:
                         letra = "a"
                 lido += letra
 
-            # print(combo, lido)
             if lido == combo[1]:
                 match combo[0]:
                     case '1':
-                        self.feiticoFrente()
+                        self.changeState("Special 1")
+                        return True
                     case '2':
-                        self.feiticoCeu()
+                        self.changeState("Special 2")
+                        return True
                     case '3':
-                        self.feiticoArea()
+                        self.changeState("Special 3")
+                        return True
                     case _:
                         raise Exception("Combo não implementado")
                 self.lidos = []
-
-    altura_braco = 75
+        return False
 
     def atack_tick(self):
         if self.STATE == "Soco M":
+
             # cria a hitbox do soco
             if self.anim == 2:
-                self.criarAtackHitbox(75, 50, self.altura_braco)
+                self.criarAtackHitbox(*self.pontos_colisoes[0]) # largura altura posy
 
             # remove a hitbox do soco
             if self.anim == 3:
@@ -136,12 +156,53 @@ class Personagem:
         if self.STATE == "Chute M":
             # cria a hitbox do chute
             if self.anim == 2:
-                self.criarAtackHitbox(110, 60, 200)
+                self.criarAtackHitbox(*self.pontos_colisoes[1])
 
 
             # remove a hitbox do chute
             if self.anim == 3:
                 self.atack_box = None
+
+        if self.STATE == "Soco S":
+
+            # cria a hitbox do soco
+            if self.anim == 2:
+                self.criarAtackHitbox(*self.pontos_colisoes[2]) # largura altura posy
+
+            # remove a hitbox do soco
+            if self.anim == 3:
+                self.atack_box = None
+
+        if self.STATE == "Chute S":
+            # cria a hitbox do chute
+            if self.anim == 2:
+                self.criarAtackHitbox(*self.pontos_colisoes[3])
+
+
+            # remove a hitbox do chute
+            if self.anim == 3:
+                self.atack_box = None
+
+        if self.STATE == "Special 1":
+            if self.anim == 2 and self.pode_special:
+                self.feiticoFrente()
+                self.pode_special = False
+            if self.anim == 3:
+                self.pode_special = True
+
+        if self.STATE == "Special 2":
+            if self.anim == 2 and self.pode_special:
+                self.feiticoCeu()
+                self.pode_special = False
+            if self.anim == 3:
+                self.pode_special = True
+
+        if self.STATE == "Special 3":
+            if self.anim == 2 and self.pode_special:
+                self.feiticoArea()
+                self.pode_special = False
+            if self.anim == 3:
+                self.pode_special = True
 
     def tick(self):
 
@@ -160,9 +221,13 @@ class Personagem:
 
         if abs(self.y - 500) < 3:
             self.pulavel = True
+            if self.STATE == "Pulo":
+                self.changeState("Idle M")
 
         self.colision_box.x = self.x+128
         self.colision_box.y = self.y
+        if self.agaixado:
+            self.colision_box.y = self.y+ self.corrige_vertical_sentado
 
         self.tempoAnim += 1
         if self.tempoAnim >= self.tempoAnimMax[self.STATE]:
@@ -171,8 +236,10 @@ class Personagem:
             if self.anim >= len(self.imagem):
             # if self.anim >= 2:
                 self.anim = 0
-                if self.STATE == "Soco M" or self.STATE == "Chute M":
+                if self.STATE == "Soco M" or self.STATE == "Chute M" or self.STATE == "Special 1" or self.STATE == "Special 2" or self.STATE == "Special 3":
                     self.changeState("Idle M")
+                if self.STATE == "Soco S" or self.STATE == "Chute S":
+                    self.changeState("Idle S")
         if self.deCostas:
             if self.anim == 0:
                 self.orientacao = 1 - self.orientacao
@@ -181,7 +248,6 @@ class Personagem:
                 self.changeState(self.STATE)
 
         self.atack_tick()
-        self.verificadorCombo()
     
 
     controles = {"a": (pygame.K_a, pygame.K_LEFT), "d": (pygame.K_d, pygame.K_RIGHT), "w": (pygame.K_w, pygame.K_UP), "s": (pygame.K_s, pygame.K_DOWN), "f": (pygame.K_f, pygame.K_COMMA), "g": (pygame.K_g, pygame.K_PERIOD), "h": (pygame.K_h, pygame.K_SEMICOLON)}
@@ -191,15 +257,18 @@ class Personagem:
     codificacaoInversa = ({pygame.K_a: "a", pygame.K_d: "d", pygame.K_w: "w", pygame.K_s: "s", pygame.K_f: "f", pygame.K_g: "g", pygame.K_h: "h"},{pygame.K_LEFT: "a", pygame.K_RIGHT: "d", pygame.K_UP: "w", pygame.K_DOWN: "s", pygame.K_COMMA: "f", pygame.K_PERIOD: "g", pygame.K_SEMICOLON: "h"})
 
     def agaixar(self):
-        pass
+        self.agaixado = True
+        self.changeState("Idle S")
 
     def levantar(self):
-        pass
+        self.agaixado = False
+        self.changeState("Idle M")
 
     def saltar(self):
         if self.pulavel:
             self.vely = -45
             self.pulavel = False
+            self.changeState("Pulo")
 
     def soco(self):
         self.changeState("Soco M")
@@ -208,26 +277,28 @@ class Personagem:
         self.changeState("Chute M")
 
     def defender(self):
-        self.changeState("Defesa M")
+        self.changeState("Defende M")
     
     def soltarDefesa(self):
         self.changeState("Idle M")
 
     def feiticoFrente(self):
-        largura_projetil = 32
+        largura_projetil = 64
         if self.orientacao == 0:
-            projetil = ProjetilLateral(self.x+128//2-largura_projetil, self.y+self.altura_braco, self.orientacao, f"imgs/lutadores/{self.id}/projetilLateral.png", largura_projetil, self.debug)
+            projetil = ProjetilLateral(self.x+128//2-largura_projetil, self.y+self.pontos_colisoes[0][2], self.orientacao, f"imgs/lutadores/{self.id}/projetilLateral.png", largura_projetil, self.debug)
         else:
-            projetil = ProjetilLateral(self.x+self.colision_box.width+128+ 128//2, self.y+self.altura_braco, self.orientacao, f"imgs/lutadores/{self.id}/projetilLateral.png", largura_projetil, self.debug)
+            projetil = ProjetilLateral(self.x+self.colision_box.width+128+ 128//2, self.y+self.pontos_colisoes[0][2], self.orientacao, f"imgs/lutadores/{self.id}/projetilLateral.png", largura_projetil, self.debug)
 
         self.projetils_lancados.append(projetil)
 
     def feiticoCeu(self):
-        projetil = ProjetilCeu(self.x, self.y, self.orientacao)
+        largura_projetil = 64
+        projetil = ProjetilCeu(self.x, self.y, self.orientacao, f"imgs/lutadores/{self.id}/projetilLateral.png", largura_projetil, self.debug)
         self.projetils_lancados.append(projetil)
 
     def feiticoArea(self):
-        projetil = ProjetilArea(self.x, self.y, self.orientacao)
+        largura_projetil = 64
+        projetil = ProjetilArea(self.x, self.y, self.orientacao, f"imgs/lutadores/{self.id}/projetilLateral.png", largura_projetil, self.debug)
         self.projetils_lancados.append(projetil)
 
     def input(self, evento):
@@ -237,6 +308,8 @@ class Personagem:
                 self.lidos.append(evento.key)
                 if len(self.lidos) > self.maior_combo:
                     self.lidos.pop(0)
+                if self.verificadorCombo():
+                    return
             if evento.key == self.controles["a"][self.team]:
                 self.velx += -self.impulso
                 self.changeState("Andar M")
@@ -266,7 +339,8 @@ class Personagem:
                 self.levantar()
 
             if evento.key == self.controles["h"][self.team]:
-                self.soltarDefesa()
+                if self.defendendo:
+                    self.soltarDefesa()
 
     def renderGUI(self, screen):
         # desenha a barra de vida la em cima e depende do team

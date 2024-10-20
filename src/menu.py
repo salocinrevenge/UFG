@@ -14,7 +14,7 @@ class Menu():
         self.selection = [None, None, None]
 
         self.STATE = "Start"
-        self.selection = ['cenario 1', 'Jogador 1', 'Jogador 1']
+        self.selection = ['cenario 1', 'Jogador 4', 'Jogador 4']
 
     def tick(self):
         if self.STATE == "Lutar":
