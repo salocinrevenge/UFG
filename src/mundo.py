@@ -15,6 +15,11 @@ class Mundo():
         self.contador_fim = 0
         self.mostrar_press_anything = False
         self.projeteis = []
+        try:
+            with open(f"imgs/{objetos[0].split()[0]}/{objetos[0].split()[1]}/desloc.txt", "r") as f:
+                self.desloc = tuple(map(int, f.readline().split()))
+        except:
+            self.desloc = (0,0)
 
     def tick(self):
         if self.vitoria != None:
@@ -124,7 +129,7 @@ class Mundo():
         
     
     def render(self, screen):
-        self.camera.render(screen, self.fundo, (-1000,-1600))
+        self.camera.render(screen, self.fundo, self.desloc)
         self.player1.render(screen, self.camera)
         self.player2.render(screen, self.camera)
 
