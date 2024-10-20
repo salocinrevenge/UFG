@@ -13,6 +13,7 @@ class Mundo():
         self.vitoria = None
         self.contador_fim = 0
         self.mostrar_press_anything = False
+        self.projeteis = []
 
     def tick(self):
         if self.vitoria != None:
@@ -30,6 +31,19 @@ class Mundo():
             self.vitoria = self.player2
         if self.player2.vida <= 0:
             self.vitoria = self.player1
+
+        for projetil in self.player1.projetils_lancados:
+            self.projeteis.append(projetil)
+        for projetil in self.player2.projetils_lancados:
+            self.projeteis.append(projetil)
+        to_remove = []
+        for i in range(len(self.projeteis)):
+            self.projeteis[i].tick()
+            if not self.projeteis[i].vivo:
+                to_remove.append(i)
+        for i in to_remove[::-1]:
+            self.projeteis.pop(i)
+        
 
     def limitar(self):
         if self.player1.x < 0:
@@ -103,6 +117,9 @@ class Mundo():
         self.camera.render(screen, self.fundo, (-1000,-1600))
         self.player1.render(screen, self.camera)
         self.player2.render(screen, self.camera)
+
+        for projetil in self.projeteis:
+            projetil.render(screen, self.camera)
 
         # Mostra o texto <nome> venceu no meio da tela
 

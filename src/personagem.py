@@ -1,5 +1,7 @@
 import pygame
 import os
+from projetil import ProjetilLateral, ProjetilCeu, ProjetilArea
+
 class Personagem:
     def __init__(self, id, pos, team) -> None:
         self.id = id.split()[1]
@@ -33,6 +35,8 @@ class Personagem:
             pass
         self.nome = self.nome + " " + str(self.team+1)
         self.vivo = True
+
+        self.projetils_lancados = []
 
     def damage(self, dano):
         if self.defendendo:
@@ -69,7 +73,6 @@ class Personagem:
             self.atack_box = pygame.Rect(self.x+128-largura_atack_box, self.y+posy, largura_atack_box, altura_atack_box)
         else:
             self.atack_box = pygame.Rect(self.x+self.colision_box.width+128, self.y+posy, largura_atack_box, altura_atack_box)
-
 
     def atack_tick(self):
         if self.STATE == "Soco M":
@@ -150,13 +153,26 @@ class Personagem:
         self.changeState("Soco M")
     
     def chute(self):
-        self.changeState("Chute M")
+        # self.changeState("Chute M")
+        self.lancaProjetil()
 
     def defender(self):
         self.changeState("Defesa M")
     
     def soltarDefesa(self):
         self.changeState("Idle M")
+
+    def lancaProjetil(self):
+        projetil = ProjetilLateral(self.x, self.y, self.orientacao, f"imgs/lutadores/{self.id}/projetilLateral.png")
+        self.projetils_lancados.append(projetil)
+
+    def feiticoCeu(self):
+        projetil = ProjetilCeu(self.x, self.y, self.orientacao)
+        self.projetils_lancados.append(projetil)
+
+    def feiticoArea(self):
+        projetil = ProjetilArea(self.x, self.y, self.orientacao)
+        self.projetils_lancados.append(projetil)
 
     def input(self, evento):
 
