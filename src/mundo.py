@@ -78,14 +78,14 @@ class Mundo():
             else:
                 self.player2.x -= 10
             self.player1.attack_box = None
-            self.player2.damage(self.player1.dano)
+            self.player2.damage(self.player1.danos[self.player1.STATE])
         if self.player2.atack_box != None and self.player2.atack_box.colliderect(self.player1.colision_box):
             if self.player1.x < self.player2.x:
                 self.player1.x -= 10
             else:
                 self.player1.x += 10
             self.player2.attack_box = None
-            self.player1.damage(self.player2.dano)
+            self.player1.damage(self.player2.danos[self.player2.STATE])
 
         
     def input(self, evento):

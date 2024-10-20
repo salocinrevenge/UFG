@@ -16,13 +16,13 @@ class Personagem:
         self.anim = 0
         self.tempoAnim = 0
         self.tempoAnimMax = {"Idle M": 15, "Andar M": 10, "Soco M": 5, "Chute M": 10, "Defesa M": 1}
+        self.danos = {"Soco M": 1, "Chute M": 2}
         self.team = team
         self.colision_box = pygame.Rect(self.x+128, self.y, 128, 384)
         self.pulavel = True
         self.deCostas = False
         self.corrige_horizontal = 0
-        self.dano = 1
-        self.vida_max = 100
+        self.vida_max = 200
         self.vida = self.vida_max
         # pega o nome do name.txt
         self.nome = "Jogador "+str(self.id)
@@ -35,6 +35,8 @@ class Personagem:
         self.vivo = True
 
     def damage(self, dano):
+        if self.defendendo:
+            dano = dano//2
         self.vida -= dano
         self.vida = max(0, self.vida)
         self.vida = min(self.vida_max, self.vida)
@@ -46,6 +48,9 @@ class Personagem:
         self.atack_box = None
         self.anim = 0
         self.STATE = state
+        self.defendendo = False
+        if state == "Defesa M":
+            self.defendendo = True
         if state+str(self.orientacao) not in self.imagens:
             self.imagens[state+str(self.orientacao)] = []
             for img in sorted(os.listdir(f"imgs/lutadores/{self.id}/{state}/")):
@@ -127,7 +132,7 @@ class Personagem:
 
     
 
-    controles = {"a": (pygame.K_a, pygame.K_LEFT), "d": (pygame.K_d, pygame.K_RIGHT), "w": (pygame.K_w, pygame.K_UP), "s": (pygame.K_s, pygame.K_DOWN), "f": (pygame.K_f, pygame.K_COMMA), "g": (pygame.K_g, pygame.K_PERIOD), "h": (pygame.K_h, pygame.K_SLASH)}
+    controles = {"a": (pygame.K_a, pygame.K_LEFT), "d": (pygame.K_d, pygame.K_RIGHT), "w": (pygame.K_w, pygame.K_UP), "s": (pygame.K_s, pygame.K_DOWN), "f": (pygame.K_f, pygame.K_COMMA), "g": (pygame.K_g, pygame.K_PERIOD), "h": (pygame.K_h, 59)}
 
 
     def agaixar(self):
@@ -149,6 +154,9 @@ class Personagem:
 
     def defender(self):
         self.changeState("Defesa M")
+    
+    def soltarDefesa(self):
+        self.changeState("Idle M")
 
     def input(self, evento):
 
@@ -168,8 +176,8 @@ class Personagem:
                 self.soco()
             if evento.key == self.controles["g"][self.team]:
                 self.chute()
-            # if evento.key == self.controles["h"][self.team]:
-            #     self.defender()
+            if evento.key == self.controles["h"][self.team]:
+                self.defender()
 
         if evento.type == pygame.KEYUP:
             if evento.key == self.controles["a"][self.team]:
@@ -181,8 +189,8 @@ class Personagem:
             if evento.key == self.controles["s"][self.team]:
                 self.levantar()
 
-            # if evento.key == self.controles["h"][self.team]:
-            #     self.soltarDefesa()
+            if evento.key == self.controles["h"][self.team]:
+                self.soltarDefesa()
 
     def renderGUI(self, screen):
         # desenha a barra de vida la em cima e depende do team
