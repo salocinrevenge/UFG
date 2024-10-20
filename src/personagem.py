@@ -1,6 +1,6 @@
 import pygame
 import os
-from projetil import ProjetilLateral, ProjetilCeu, ProjetilArea
+from src.projetil import ProjetilLateral, ProjetilCeu, ProjetilArea
 
 class Personagem:
     def __init__(self, id, pos, team, debug = False) -> None:
@@ -224,7 +224,10 @@ class Personagem:
             if self.STATE == "Pulo":
                 self.changeState("Idle M")
 
-        self.colision_box.x = self.x+128
+        self.colision_box.x = self.x+256-self.colision_box.width
+        if self.orientacao == 1:
+            self.colision_box.x = self.x +128
+            # self.colision_box.x -= 80
         self.colision_box.y = self.y
         if self.agaixado:
             self.colision_box.y = self.y+ self.corrige_vertical_sentado

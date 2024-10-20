@@ -1,8 +1,8 @@
 import pygame
 import time
 import asyncio
-from menu import Menu
-from excessoes.std import Std
+from src.menu import Menu
+from src.excessoes.std import Std
 
 class Coracao():
 

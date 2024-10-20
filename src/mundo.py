@@ -1,7 +1,7 @@
 import pygame
-from camera import Camera
-from personagem import Personagem
-from excessoes.std import Std
+from src.camera import Camera
+from src.personagem import Personagem
+from src.excessoes.std import Std
 
 class Mundo():
     def __init__(self, objetos) -> None:
