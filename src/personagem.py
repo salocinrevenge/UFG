@@ -286,11 +286,12 @@ class Personagem:
         self.changeState("Idle M")
 
     def feiticoFrente(self):
-        largura_projetil = 64
+        largura = self.pontos_colisoes[6][0]
+        altura = self.pontos_colisoes[6][1]
         if self.orientacao == 0:
-            projetil = ProjetilLateral(self.x+128//2-largura_projetil, self.y+self.pontos_colisoes[0][2], self.orientacao, f"imgs/lutadores/{self.id}/projetilLateral.png", largura_projetil, self.debug)
+            projetil = ProjetilLateral(self.x+128//2-largura, self.y+self.pontos_colisoes[0][2], self.orientacao, f"imgs/lutadores/{self.id}/projetilLateral.png", largura = largura, altura = altura, debug = self.debug)
         else:
-            projetil = ProjetilLateral(self.x+self.colision_box.width+128+ 128//2, self.y+self.pontos_colisoes[0][2], self.orientacao, f"imgs/lutadores/{self.id}/projetilLateral.png", largura_projetil, self.debug)
+            projetil = ProjetilLateral(self.x+self.colision_box.width+128+ 128//2, self.y+self.pontos_colisoes[0][2], self.orientacao, f"imgs/lutadores/{self.id}/projetilLateral.png", largura = largura, altura = altura, debug = self.debug)
 
         self.projetils_lancados.append(projetil)
 

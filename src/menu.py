@@ -13,8 +13,8 @@ class Menu():
         self.fonte_padrao = pygame.font.Font(None, 200)
         self.selection = [None, None, None]
 
-        # self.STATE = "Start"
-        # self.selection = ['cenario 3', 'Jogador 3', 'Jogador 1']
+        self.STATE = "Start"
+        self.selection = ['cenario 3', 'Jogador 3', 'Jogador 1']
 
     def tick(self):
         if self.STATE == "Lutar":

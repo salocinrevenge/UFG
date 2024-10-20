@@ -1,7 +1,7 @@
 import pygame
 
 class ProjetilLateral:
-    def __init__(self, x, y, orientacao, path, tamanho = 32, debug = False, dano = 10):
+    def __init__(self, x, y, orientacao, path, largura = 32, altura = 32, debug = False, dano = 10):
         self.x = x
         self.y = y
         self.orientacao = orientacao
@@ -10,9 +10,9 @@ class ProjetilLateral:
         self.vivo = True
         self.imagem = pygame.image.load(path)
         # um quarto do tamanho
-        self.imagem = pygame.transform.scale(self.imagem, (tamanho, tamanho))
+        self.imagem = pygame.transform.scale(self.imagem, (largura, altura))
         self.debug = debug
-        self.colision_box = pygame.Rect(self.x, self.y, tamanho, tamanho)
+        self.colision_box = pygame.Rect(self.x, self.y, largura, altura)
         self.dano = dano
 
     def atingiu(self):
