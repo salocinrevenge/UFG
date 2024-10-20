@@ -15,7 +15,7 @@ class Personagem:
         self.changeState("Idle M")
         self.anim = 0
         self.tempoAnim = 0
-        self.tempoAnimMax = 15
+        self.tempoAnimMax = {"Idle M": 15, "Andar M": 10, "Soco M": 5, "Chute M": 10, "Defesa M": 1}
         self.team = team
         self.colision_box = pygame.Rect(self.x+128, self.y, 128, 384)
         self.pulavel = True
@@ -108,7 +108,7 @@ class Personagem:
         self.colision_box.y = self.y
 
         self.tempoAnim += 1
-        if self.tempoAnim >= self.tempoAnimMax:
+        if self.tempoAnim >= self.tempoAnimMax[self.STATE]:
             self.tempoAnim = 0
             self.anim += 1
             if self.anim >= len(self.imagem):
