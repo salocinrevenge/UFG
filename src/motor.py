@@ -1,8 +1,8 @@
 import pygame
 import time
 import asyncio
-from menu import Menu
-from excessoes.std import Std
+from src.menu import Menu
+from src.excessoes.std import Std
 
 class Coracao():
 
@@ -12,6 +12,7 @@ class Coracao():
         # Definir as dimensões da janela
         dimensoes = pygame.display.get_desktop_sizes()[0]
         self.WINDOW_WIDTH = dimensoes[0] * 0.7
+        self.WINDOW_WIDTH = 1800
         self.WINDOW_WIDTH = 800
         self.WINDOW_HEIGHT = dimensoes[1] * 0.7
         self.WINDOW_HEIGHT = 800+100
@@ -20,7 +21,9 @@ class Coracao():
         self.menu = Menu()
         # Criar a janela
         self.screen = pygame.display.set_mode((self.WINDOW_WIDTH, self.WINDOW_HEIGHT), pygame.RESIZABLE)
-        pygame.display.set_caption("Piratas do KaLibre") # titulo da janela
+        pygame.display.set_caption("UNICAMP FIGHTING GAME") # titulo da janela
+        # forca fullscreen
+        pygame.display.toggle_fullscreen()
         
 
 
@@ -110,6 +113,8 @@ class Coracao():
                 pygame.quit()
                 quit()
             self.menu.input(event)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_F11:
+                pygame.display.toggle_fullscreen()
 
     def dispose(self):      # metodo chamado quando o jogo fecha
             pass

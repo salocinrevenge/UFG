@@ -1,8 +1,8 @@
 import pygame
-from botao import Botao
-from mundo import Mundo
-from excessoes.std import Std
-from choice import Choice
+from src.botao import Botao
+from src.mundo import Mundo
+from src.excessoes.std import Std
+from src.choice import Choice
 
 class Menu():
     def __init__(self) -> None:
@@ -92,7 +92,6 @@ class Menu():
                         if clique == "Start":
                             if self.selection[0] != None and self.selection[1] != None and self.selection[2] != None:
                                 self.STATE = "Start"
-                                print("Start")
                                 return
                         if clique == "Cenario 1" and self.selection[0] == None:
                             self.selecao[0].index = 0
@@ -145,5 +144,9 @@ class Menu():
             try:
                 self.mundo.input(evento)
             except Std as e:
-                print(e.message)
+                if e.message == "Game Over":
+                    self.STATE = "Menu"
+                    self.mundo = None
+                    self.selection = [None, None, None]
+                    return
             
