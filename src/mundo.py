@@ -17,6 +17,7 @@ class Mundo():
         self.player2.tick()
         self.colisao()
         self.limitar()
+        self.orientar()
 
     def limitar(self):
         if self.player1.x < 0:
@@ -35,6 +36,18 @@ class Mundo():
             else:
                 self.player1.x -= 10
                 self.player2.x += 10
+
+    def orientar(self):
+        if self.player1.x < self.player2.x:
+            if self.player1.orientacao == 0:
+                self.player1.setDeCostas()
+            if self.player2.orientacao == 1:
+                self.player2.setDeCostas()
+        else:
+            if self.player1.orientacao == 1:
+                self.player1.setDeCostas()
+            if self.player2.orientacao == 0:
+                self.player2.setDeCostas()
         
 
     def colisao(self):

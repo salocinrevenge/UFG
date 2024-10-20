@@ -11,6 +11,7 @@ class Personagem:
         self.velx = 0
         self.vely = 0
         self.impulso = 10
+        self.orientacao = 0
         self.changeState("Idle M")
         self.anim = 0
         self.tempoAnim = 0
@@ -18,16 +19,25 @@ class Personagem:
         self.team = team
         self.colision_box = pygame.Rect(self.x+128, self.y, 128, 384)
         self.pulavel = True
+        self.deCostas = False
+        self.corrige_horizontal = 0
 
     
     def changeState(self, state):
         self.anim = 0
         self.STATE = state
-        if state not in self.imagens:
-            self.imagens[state] = []
+        if state+str(self.orientacao) not in self.imagens:
+            self.imagens[state+str(self.orientacao)] = []
             for img in sorted(os.listdir(f"imgs/lutadores/{self.id}/{state}/")):
-                self.imagens[state].append(pygame.image.load(f"imgs/lutadores/{self.id}/{state}/{img}"))
-        self.imagem = self.imagens[state]
+                if self.orientacao == 0:
+                    nova_imagem = pygame.image.load(f"imgs/lutadores/{self.id}/{state}/{img}")
+                else:
+                    nova_imagem = pygame.transform.flip(pygame.image.load(f"imgs/lutadores/{self.id}/{state}/{img}"), True, False)
+                self.imagens[state+str(self.orientacao)].append(nova_imagem)
+        self.imagem = self.imagens[state+str(self.orientacao)]
+
+    def setDeCostas(self):
+        self.deCostas = True
 
     def tick(self):
         self.x += self.velx
@@ -58,6 +68,12 @@ class Personagem:
                 self.anim = 0
                 if self.STATE == "Soco M" or self.STATE == "Chute M":
                     self.changeState("Idle M")
+        if self.deCostas:
+            if self.anim == 0:
+                self.orientacao = 1 - self.orientacao
+                self.corrige_horizontal = 128 - self.corrige_horizontal
+                self.deCostas = False
+                self.changeState(self.STATE)
 
     # virgula é pygame.K_COMMA
     controles = {"a": (pygame.K_a, pygame.K_LEFT), "d": (pygame.K_d, pygame.K_RIGHT), "w": (pygame.K_w, pygame.K_UP), "s": (pygame.K_s, pygame.K_DOWN), "f": (pygame.K_f, pygame.K_COMMA), "g": (pygame.K_g, pygame.K_PERIOD), "h": (pygame.K_h, pygame.K_SLASH)}
@@ -120,6 +136,6 @@ class Personagem:
     def render(self, screen, camera):
         debug = True
         if debug:
-            camera.render(screen, self.imagem[self.anim], (self.x, self.y), self.colision_box)
+            camera.render(screen, self.imagem[self.anim], (self.x+self.corrige_horizontal, self.y), self.colision_box)
         else:
-            camera.render(screen, self.imagem[self.anim], (self.x, self.y))
+            camera.render(screen, self.imagem[self.anim], (self.x+self.corrige_horizontal, self.y))
