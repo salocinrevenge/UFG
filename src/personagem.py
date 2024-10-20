@@ -21,9 +21,29 @@ class Personagem:
         self.pulavel = True
         self.deCostas = False
         self.corrige_horizontal = 0
+        self.dano = 1
+        self.vida_max = 100
+        self.vida = self.vida_max
+        # pega o nome do name.txt
+        self.nome = "Jogador "+str(self.id)
+        try:
+            with open(f"imgs/lutadores/{self.id}/name.txt") as f:
+                self.nome = f.read().strip()
+        except FileNotFoundError:
+            pass
+        self.nome = self.nome + " " + str(self.team+1)
+        self.vivo = True
+
+    def damage(self, dano):
+        self.vida -= dano
+        self.vida = max(0, self.vida)
+        self.vida = min(self.vida_max, self.vida)
+        if self.vida == 0:
+            self.vivo = False
 
     
     def changeState(self, state):
+        self.atack_box = None
         self.anim = 0
         self.STATE = state
         if state+str(self.orientacao) not in self.imagens:
@@ -39,7 +59,35 @@ class Personagem:
     def setDeCostas(self):
         self.deCostas = True
 
+    def criarAtackHitbox(self, largura_atack_box, altura_atack_box, posy):
+        if self.orientacao == 0:
+            self.atack_box = pygame.Rect(self.x+128-largura_atack_box, self.y+posy, largura_atack_box, altura_atack_box)
+        else:
+            self.atack_box = pygame.Rect(self.x+self.colision_box.width+128, self.y+posy, largura_atack_box, altura_atack_box)
+
+
+    def atack_tick(self):
+        if self.STATE == "Soco M":
+            # cria a hitbox do soco
+            if self.anim == 2:
+                self.criarAtackHitbox(75, 50, 75)
+
+            # remove a hitbox do soco
+            if self.anim == 3:
+                self.atack_box = None
+
+        if self.STATE == "Chute M":
+            # cria a hitbox do chute
+            if self.anim == 2:
+                self.criarAtackHitbox(110, 60, 200)
+
+
+            # remove a hitbox do chute
+            if self.anim == 3:
+                self.atack_box = None
+
     def tick(self):
+
         self.x += self.velx
         self.y += self.vely
         self.y = min(500, self.y)
@@ -75,7 +123,10 @@ class Personagem:
                 self.deCostas = False
                 self.changeState(self.STATE)
 
-    # virgula é pygame.K_COMMA
+        self.atack_tick()
+
+    
+
     controles = {"a": (pygame.K_a, pygame.K_LEFT), "d": (pygame.K_d, pygame.K_RIGHT), "w": (pygame.K_w, pygame.K_UP), "s": (pygame.K_s, pygame.K_DOWN), "f": (pygame.K_f, pygame.K_COMMA), "g": (pygame.K_g, pygame.K_PERIOD), "h": (pygame.K_h, pygame.K_SLASH)}
 
 
@@ -133,9 +184,37 @@ class Personagem:
             # if evento.key == self.controles["h"][self.team]:
             #     self.soltarDefesa()
 
+    def renderGUI(self, screen):
+        # desenha a barra de vida la em cima e depende do team
+        largura_barra = screen.get_width()/2-20
+        altura_barra = screen.get_height()/20
+        if self.team == 0:
+            # fundo
+            pygame.draw.rect(screen, (100,100,100), (10, 10, largura_barra, altura_barra))
+            largura_vida = (largura_barra * self.vida)//self.vida_max
+            cor = (255-int(255*self.vida/self.vida_max),int(255*self.vida/self.vida_max),0)
+            pygame.draw.rect(screen, cor, (10-largura_vida+largura_barra, 10, largura_vida, altura_barra))
+            # printa o nome do jogador
+            font = pygame.font.Font(None, 48)
+            text = font.render(self.nome, True, (255, 255, 255))
+            screen.blit(text, (10+10, 10+10))
+        else:
+            pygame.draw.rect(screen, (100,100,100), (screen.get_width()-10-largura_barra, 10, largura_barra, altura_barra))
+            largura_vida = (largura_barra * self.vida)//self.vida_max
+            cor = (255-int(255*self.vida/self.vida_max),int(255*self.vida/self.vida_max),0)
+            pygame.draw.rect(screen, cor, (screen.get_width()-10-largura_barra, 10, largura_vida, altura_barra))
+            # printa o nome do jogador
+            font = pygame.font.Font(None, 48)
+            text = font.render(self.nome, True, (255, 255, 255))
+            screen.blit(text, (screen.get_width()-10-largura_barra + 10, 10+10))
+
+
+
     def render(self, screen, camera):
         debug = True
+        camera.render(screen, self.imagem[self.anim], (self.x+self.corrige_horizontal, self.y))
         if debug:
-            camera.render(screen, self.imagem[self.anim], (self.x+self.corrige_horizontal, self.y), self.colision_box)
-        else:
-            camera.render(screen, self.imagem[self.anim], (self.x+self.corrige_horizontal, self.y))
+            camera.draw_rect(screen, self.colision_box, (255,255,0))
+            if self.atack_box != None:
+                camera.draw_rect(screen, self.atack_box, (255,0,0))
+        self.renderGUI(screen)

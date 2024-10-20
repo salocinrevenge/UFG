@@ -147,5 +147,9 @@ class Menu():
             try:
                 self.mundo.input(evento)
             except Std as e:
-                print(e.message)
+                if e.message == "Game Over":
+                    self.STATE = "Menu"
+                    self.mundo = None
+                    self.selection = [None, None, None]
+                    return
             
