@@ -8,7 +8,7 @@ class Mundo():
         self.camera = Camera(self,(0,0))
         self.fundo = pygame.image.load(f"imgs/{objetos[0].split()[0]}/{objetos[0].split()[1]}/fundo.png")
         self.fundo = pygame.transform.scale(self.fundo, (self.fundo.get_width()*3.3, self.fundo.get_height()*3))
-        debug = True
+        debug = False
         self.player1 = Personagem(objetos[1], (0,500), 0, debug)
         self.player2 = Personagem(objetos[2], (600,500), 1, debug)
         self.vitoria = None
