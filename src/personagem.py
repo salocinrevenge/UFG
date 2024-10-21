@@ -17,7 +17,7 @@ class Personagem:
         self.agaixado = False
         self.anim = 0
         self.tempoAnim = 0
-        self.tempoAnimMax = {"Idle M": 15, "Andar M": 10, "Soco M": 5, "Chute M": 10, "Defende M": 1, "Idle S": 15, "Andar S": 10, "Soco S": 5, "Chute S": 10, "Defende S": 1, "Special 1": 10, "Special 2": 10, "Special 3": 10, "Pulo": 1}
+        self.tempoAnimMax = {"Idle M": 15, "Andar M": 10, "Soco M": 5, "Chute M": 10, "Defende M": 1, "Idle S": 15, "Andar S": 10, "Soco S": 5, "Chute S": 10, "Defende S": 1, "Special 1": 15, "Special 2": 15, "Special 3": 15, "Pulo": 1}
         self.danos = {"Soco M": 1, "Chute M": 2, "Soco S": 1, "Chute S": 1}
         self.team = team
         self.pulavel = True
@@ -253,11 +253,11 @@ class Personagem:
         self.atack_tick()
     
 
-    controles = {"a": (pygame.K_a, pygame.K_LEFT), "d": (pygame.K_d, pygame.K_RIGHT), "w": (pygame.K_w, pygame.K_UP), "s": (pygame.K_s, pygame.K_DOWN), "f": (pygame.K_f, pygame.K_COMMA), "g": (pygame.K_g, pygame.K_PERIOD), "h": (pygame.K_h, pygame.K_SEMICOLON)}
+    controles = {"a": (pygame.K_a, pygame.K_LEFT), "d": (pygame.K_d, pygame.K_RIGHT), "w": (pygame.K_w, pygame.K_UP), "s": (pygame.K_s, pygame.K_DOWN), "f": (pygame.K_f, pygame.K_m), "g": (pygame.K_g, pygame.K_COMMA), "h": (pygame.K_h, pygame.K_PERIOD)}
     todos_controles = ((pygame.K_a, pygame.K_d, pygame.K_w, pygame.K_s, pygame.K_f, pygame.K_g, pygame.K_h), 
-                        (pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN, pygame.K_COMMA, pygame.K_PERIOD, pygame.K_SEMICOLON))
+                        (pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN, pygame.K_m ,pygame.K_COMMA, pygame.K_PERIOD))
     
-    codificacaoInversa = ({pygame.K_a: "a", pygame.K_d: "d", pygame.K_w: "w", pygame.K_s: "s", pygame.K_f: "f", pygame.K_g: "g", pygame.K_h: "h"},{pygame.K_LEFT: "a", pygame.K_RIGHT: "d", pygame.K_UP: "w", pygame.K_DOWN: "s", pygame.K_COMMA: "f", pygame.K_PERIOD: "g", pygame.K_SEMICOLON: "h"})
+    codificacaoInversa = ({pygame.K_a: "a", pygame.K_d: "d", pygame.K_w: "w", pygame.K_s: "s", pygame.K_f: "f", pygame.K_g: "g", pygame.K_h: "h"},{pygame.K_LEFT: "a", pygame.K_RIGHT: "d", pygame.K_UP: "w", pygame.K_DOWN: "s", pygame.K_m: "f", pygame.K_COMMA: "g", pygame.K_PERIOD: "h"})
 
     def agaixar(self):
         self.agaixado = True

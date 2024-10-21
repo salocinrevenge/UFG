@@ -36,7 +36,7 @@ class ProjetilCeu:
         self.x = x
         self.y = y
         self.orientacao = orientacao
-        self.vely = 10
+        self.vely = 5
         self.tempo = 0
         self.vivo = True
         self.path = path
