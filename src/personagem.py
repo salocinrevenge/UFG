@@ -90,7 +90,7 @@ class Personagem:
         self.anim = 0
         self.STATE = state
         self.defendendo = False
-        if state == "Defende M":
+        if state == "Defende M" or state == "Defende S":
             self.defendendo = True
         if state+str(self.orientacao) not in self.imagens:
             self.imagens[state+str(self.orientacao)] = []
